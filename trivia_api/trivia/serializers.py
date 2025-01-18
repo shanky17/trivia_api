@@ -10,8 +10,12 @@ class AnswerSerializer(serializers.ModelSerializer):
 
 
 class QuestionSerializer(serializers.ModelSerializer):
-    answers = AnswerSerializer(many=True, read_only=True)
+    answers = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Question
         fields = ['category', 'question', 'answers']
+
+    def get_answers(self, question):
+        answers = question.answers.all().order_by('?')
+        return AnswerSerializer(answers, many=True).data
